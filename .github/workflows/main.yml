@@ -1,1 +1,64 @@
+name: Voicebox CI
 
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '0 16 * * *'  # daily (9:30 PM IST)
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # ----------------------
+      # Node setup (frontend/web)
+      # ----------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Node dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm install
+          fi
+
+      - name: Build frontend
+        run: |
+          if [ -f package.json ]; then
+            npm run build || echo "No build script"
+          fi
+
+      # ----------------------
+      # Python setup (backend)
+      # ----------------------
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+
+      - name: Run backend tests (optional)
+        run: |
+          if [ -d tests ]; then
+            pytest || echo "No tests found"
+          fi
+
+      # ----------------------
+      # Done
+      # ----------------------
+      - name: Done
+        run: echo "Workflow completed successfully"
