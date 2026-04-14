@@ -37,6 +37,12 @@ jobs:
             npm run build || echo "No build script"
           fi
 
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+             github_token: ${{ secrets.GITHUB_TOKEN }}
+             publish_dir: ./dist   # or build/
+
       # ----------------------
       # Python setup (backend)
       # ----------------------
